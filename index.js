@@ -122,8 +122,6 @@ const main = () => {
   });
 };
 
-if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-  main();
-}
+main();
 
 export { callTodoist, createServer, getToken };
