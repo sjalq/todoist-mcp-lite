@@ -1,6 +1,6 @@
 {
   "name": "@sjalq/todoist-mcp-lite",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Minimal Todoist MCP server with direct API passthrough - pure functional JS",
   "type": "module",
   "main": "index.js",
