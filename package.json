@@ -5,7 +5,7 @@
   "type": "module",
   "main": "index.js",
   "bin": {
-    "todoist-mcp-lite": "./index.js"
+    "todoist-mcp-lite": "index.js"
   },
   "scripts": {
     "test": "node --test test/*.test.js"
