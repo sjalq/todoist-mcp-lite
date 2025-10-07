@@ -71,13 +71,21 @@ const createServer = (apiCall) => {
   server.setRequestHandler(ListToolsRequestSchema, () => ({
     tools: [{
       name: "todoist_api",
-      description: `Direct Todoist REST API v2 access. Common uses:
-1. GET /tasks - List tasks (filter: project_id, label, filter query)
+      description: `PURE API PASSTHROUGH to Todoist REST API v2.
+Use query parameters, filters, and API features directly in the endpoint string (e.g., /tasks?filter=today or /tasks?project_id=123).
+
+⚠️ RESPONSE SIZE: Large responses may exceed token limits. Request smaller chunks using filters, project_id, specific ids, or write a standalone script to process data client-side.
+
+Anything possible via the Todoist API is possible by constructing the right API call through this passthrough.
+Common uses:
+1. GET /tasks - List tasks (supports query params: filter, project_id, label, ids)
 2. POST /tasks - Create task (required: content, optional: due_string, project_id, priority 1-4, labels array)
 3. POST /tasks/:id/close - Complete task
 4. DELETE /tasks/:id - Delete task
 5. GET /projects - List projects
-Response: {status: number, ok: boolean, data: object|array|string}. Full docs: https://developer.todoist.com/rest/v2`,
+
+Response: {status: number, ok: boolean, data: object|array|string}
+Full API docs with all parameters: https://developer.todoist.com/rest/v2`,
       inputSchema: {
         type: "object",
         properties: {
