@@ -1,0 +1,48 @@
+{
+  "name": "@sjalq/todoist-mcp-lite",
+  "version": "1.0.4",
+  "description": "Minimal Todoist MCP server with direct API passthrough - pure functional JS",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "todoist-mcp-lite": "./index.js"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.js"
+  },
+  "keywords": [
+    "mcp",
+    "todoist",
+    "model-context-protocol",
+    "claude",
+    "ai",
+    "task-management"
+  ],
+  "author": "sjalq",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sjalq/todoist-mcp-lite.git"
+  },
+  "homepage": "https://github.com/sjalq/todoist-mcp-lite#readme",
+  "bugs": {
+    "url": "https://github.com/sjalq/todoist-mcp-lite/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.18.2",
+    "abort-controller": "^3.0.0",
+    "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {
+    "fast-check": "^3.23.2"
+  }
+}
