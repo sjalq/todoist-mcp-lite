@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2026-07-23
+
+### Changed
+- Migrated base URL from deprecated REST v2 (`https://api.todoist.com/rest/v2`) to unified Todoist API v1 (`https://api.todoist.com/api/v1`)
+- Tool description and README updated for v1: list envelope `{results, next_cursor}`, opaque string IDs, cursor pagination, and task filtering via `GET /tasks/filter?query=` (replacing `/tasks?filter=`)
+
+### Fixed
+- REST v2 endpoints returning HTTP 410 Gone after Todoist deprecation
+
 ## [1.0.5] - 2025-10-07
 
 ### Changed

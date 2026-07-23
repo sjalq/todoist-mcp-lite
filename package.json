@@ -1,14 +1,14 @@
 {
   "name": "@sjalq/todoist-mcp-lite",
-  "version": "1.0.5",
-  "description": "Minimal Todoist MCP server with direct API passthrough - pure functional JS",
+  "version": "1.1.0",
+  "description": "Minimal Todoist MCP server with direct API v1 passthrough - pure functional JS",
   "type": "module",
   "main": "index.js",
   "bin": {
     "todoist-mcp-lite": "./index.js"
   },
   "scripts": {
-    "test": "node --test test/*.test.js"
+    "test": "node --test --test-force-exit test/*.test.js"
   },
   "keywords": [
     "mcp",

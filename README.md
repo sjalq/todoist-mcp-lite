@@ -4,13 +4,13 @@ Minimal Todoist MCP server with direct API passthrough. Built with pure function
 
 ## Features
 
-- ✨ Single tool with direct Todoist REST API v2 passthrough
-- 🚀 Supports all HTTP methods (GET, POST, PUT, PATCH, DELETE)
-- 🔒 CLI `--token` flag or environment variable authentication
-- 📦 NPX-ready - no installation required
-- 🧪 Comprehensive test suite (property-based + integration + MCP protocol tests)
-- 🎯 Pure functional JavaScript - minimal dependencies
-- 💡 Token-efficient tool descriptions
+- Single tool with direct Todoist API v1 passthrough (`https://api.todoist.com/api/v1`)
+- Supports all HTTP methods (GET, POST, PUT, PATCH, DELETE)
+- CLI `--token` flag or environment variable authentication
+- NPX-ready - no installation required
+- Comprehensive test suite (property-based + integration + MCP protocol tests)
+- Pure functional JavaScript - minimal dependencies
+- Token-efficient tool descriptions
 
 ## Getting Your Todoist API Token
 
@@ -33,7 +33,7 @@ export TODOIST_API_TOKEN=YOUR_TODOIST_TOKEN
 npx @sjalq/todoist-mcp-lite
 ```
 
-### In Claude Desktop config
+### In Claude Desktop / Claude Code config
 
 Add to your `~/.claude.json`:
 
@@ -44,6 +44,23 @@ Add to your `~/.claude.json`:
       "type": "stdio",
       "command": "npx",
       "args": ["-y", "@sjalq/todoist-mcp-lite"],
+      "env": {
+        "TODOIST_API_TOKEN": "your_token_here"
+      }
+    }
+  }
+}
+```
+
+Or with local checkout:
+
+```json
+{
+  "mcpServers": {
+    "todoist": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["/path/to/todoist-mcp-lite/index.js"],
       "env": {
         "TODOIST_API_TOKEN": "your_token_here"
       }
@@ -72,16 +89,43 @@ The server exposes a single tool: `todoist_api`
 
 ### Parameters
 
-- `endpoint` (string, required): API endpoint (e.g., `/tasks`, `/projects/123`)
+- `endpoint` (string, required): API path under `/api/v1` (e.g., `/tasks`, `/projects`, `/tasks/filter?query=today`)
 - `method` (string, required): HTTP method (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`)
 - `body` (object, optional): Request body for POST/PUT/PATCH requests
 
 ### Response
 
-Returns JSON with:
+The MCP wrapper always returns:
+
 - `status`: HTTP status code
 - `ok`: boolean indicating success
-- `data`: Response data from Todoist API (or error object)
+- `data`: Response body from Todoist (or error object)
+
+### List endpoints (v1 envelope)
+
+Paginated list endpoints (e.g. `GET /projects`, `GET /tasks`) return:
+
+```json
+{
+  "results": [ /* items */ ],
+  "next_cursor": "opaque-cursor-or-null"
+}
+```
+
+Not a bare array. Read items from `data.results`. For the next page, pass `?cursor=<next_cursor>&limit=50`.
+
+IDs are opaque strings.
+
+### Filtering tasks (v1 change)
+
+REST v2 used `GET /tasks?filter=today`. That was removed.
+
+Use:
+
+```
+GET /tasks/filter?query=today
+GET /tasks/filter?query=overdue
+```
 
 ### Example
 
@@ -98,7 +142,9 @@ Returns JSON with:
 
 ## API Documentation
 
-Full Todoist REST API v2 docs: https://developer.todoist.com/rest/v2
+Full Todoist API v1 docs: https://developer.todoist.com/api/v1/
+
+Migration notes (REST v2 / Sync v9 → v1): pagination, opaque string IDs, `/tasks/filter?query=`, and other renames are covered under "Migrating from v9" in those docs.
 
 ## Development
 

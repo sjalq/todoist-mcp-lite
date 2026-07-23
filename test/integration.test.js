@@ -5,22 +5,41 @@ import { callTodoist } from "../index.js";
 const token = process.env.TODOIST_API_TOKEN;
 const skipIfNoToken = token ? test : test.skip;
 
-skipIfNoToken("GET /projects returns projects list", async () => {
+const isPaginatedList = (data) =>
+  data &&
+  typeof data === "object" &&
+  Array.isArray(data.results) &&
+  ("next_cursor" in data);
+
+skipIfNoToken("GET /projects returns projects list envelope", async () => {
   const apiCall = callTodoist(token);
   const result = await apiCall("/projects", "GET");
 
   assert.strictEqual(result.ok, true);
   assert.strictEqual(result.status, 200);
-  assert.ok(Array.isArray(result.data));
+  assert.ok(isPaginatedList(result.data), "data should be {results, next_cursor}");
+  assert.ok(result.data.results.length >= 0);
+  if (result.data.results.length > 0) {
+    assert.strictEqual(typeof result.data.results[0].id, "string");
+  }
 });
 
-skipIfNoToken("GET /tasks returns tasks list", async () => {
+skipIfNoToken("GET /tasks returns tasks list envelope", async () => {
   const apiCall = callTodoist(token);
   const result = await apiCall("/tasks", "GET");
 
   assert.strictEqual(result.ok, true);
   assert.strictEqual(result.status, 200);
-  assert.ok(Array.isArray(result.data));
+  assert.ok(isPaginatedList(result.data), "data should be {results, next_cursor}");
+});
+
+skipIfNoToken("GET /tasks/filter?query=today returns filtered tasks", async () => {
+  const apiCall = callTodoist(token);
+  const result = await apiCall("/tasks/filter?query=today", "GET");
+
+  assert.strictEqual(result.ok, true);
+  assert.strictEqual(result.status, 200);
+  assert.ok(isPaginatedList(result.data), "data should be {results, next_cursor}");
 });
 
 skipIfNoToken("POST /tasks creates a task and DELETE removes it", async () => {
@@ -32,15 +51,17 @@ skipIfNoToken("POST /tasks creates a task and DELETE removes it", async () => {
   });
 
   assert.strictEqual(createResult.ok, true);
-  assert.strictEqual(createResult.status, 200);
+  assert.ok([200, 201].includes(createResult.status), `unexpected create status ${createResult.status}`);
   assert.ok(createResult.data.id);
+  assert.strictEqual(typeof createResult.data.id, "string");
   assert.strictEqual(createResult.data.content, "Test task from MCP integration test");
 
   const taskId = createResult.data.id;
   const deleteResult = await apiCall(`/tasks/${taskId}`, "DELETE");
 
   assert.strictEqual(deleteResult.ok, true);
-  assert.strictEqual(deleteResult.status, 204);
+  // v1 documents 200 with null body; accept 204 as well for compatibility
+  assert.ok([200, 204].includes(deleteResult.status), `unexpected delete status ${deleteResult.status}`);
 });
 
 skipIfNoToken("Invalid token returns 401 error", async () => {
@@ -57,20 +78,4 @@ skipIfNoToken("Invalid endpoint returns 404 error", async () => {
 
   assert.strictEqual(result.ok, false);
   assert.strictEqual(result.status, 404);
-});
-
-skipIfNoToken("POST /tasks creates a task for today (no teardown)", async () => {
-  const apiCall = callTodoist(token);
-
-  const createResult = await apiCall("/tasks", "POST", {
-    content: "MCP Lite integration test - created today",
-    due_string: "today"
-  });
-
-  assert.strictEqual(createResult.ok, true);
-  assert.strictEqual(createResult.status, 200);
-  assert.ok(createResult.data.id);
-  assert.strictEqual(createResult.data.content, "MCP Lite integration test - created today");
-
-  console.log(`Created task with ID: ${createResult.data.id}`);
 });
